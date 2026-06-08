@@ -3,16 +3,7 @@ import DesktopIcon from './DesktopIcon'
 import ContextMenu from './ContextMenu'
 import WindowManager from '../window'
 import { useWindowStore } from '../../store/useWindowStore'
-
-const ICONS = [
-  { label: 'About',        icon: '👤', appId: 'about',        size: { width: 680, height: 480 } },
-  { label: 'Projects',     icon: '🗂️', appId: 'projects',     size: { width: 800, height: 560 } },
-  { label: 'Skills',       icon: '⚡', appId: 'skills',       size: { width: 640, height: 480 } },
-  { label: 'Resume',       icon: '📄', appId: 'resume',       size: { width: 680, height: 520 } },
-  { label: 'Contact',      icon: '✉️', appId: 'contact',      size: { width: 560, height: 440 } },
-  { label: 'Terminal',     icon: '>_', appId: 'terminal',     size: { width: 640, height: 400 } },
-  { label: 'AI Assistant', icon: '✦',  appId: 'ai-assistant', size: { width: 520, height: 560 } },
-]
+import { APP_REGISTRY } from '../../core/app-registry'
 
 interface MenuState { x: number; y: number }
 
@@ -27,13 +18,6 @@ export default function Desktop() {
 
   const closeMenu = useCallback(() => setMenu(null), [])
 
-  const handleIconOpen = useCallback(
-    (appId: string, label: string, icon: string, size: { width: number; height: number }) => {
-      openWindow({ appId, title: label, icon, size })
-    },
-    [openWindow]
-  )
-
   return (
     <div
       className="relative w-full h-full overflow-hidden select-none"
@@ -46,14 +30,14 @@ export default function Desktop() {
         <div className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full bg-[#38BDF8]/3 blur-3xl pointer-events-none" />
       </div>
 
-      {/* Desktop Icon Grid */}
+      {/* Desktop Icon Grid — generated from registry */}
       <div className="absolute top-6 left-6 flex flex-col flex-wrap gap-2 max-h-[calc(100vh-96px)] z-10">
-        {ICONS.map((item) => (
+        {APP_REGISTRY.map((app) => (
           <DesktopIcon
-            key={item.label}
-            label={item.label}
-            icon={item.icon}
-            onOpen={() => handleIconOpen(item.appId, item.label, item.icon, item.size)}
+            key={app.id}
+            label={app.name}
+            icon={app.icon}
+            onOpen={() => openWindow(app.id)}
           />
         ))}
       </div>

@@ -1,1 +1,3 @@
-// Skills app — implemented in Milestone 5
+export default function SkillsApp() {
+  return null // Implemented in Milestone 5
+}

@@ -1,1 +1,3 @@
-// Projects app — implemented in Milestone 5
+export default function ProjectsApp() {
+  return null // Implemented in Milestone 5
+}

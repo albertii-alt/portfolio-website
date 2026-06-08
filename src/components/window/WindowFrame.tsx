@@ -1,15 +1,15 @@
-import { useRef, useCallback } from 'react'
+import { useRef, useCallback, Suspense } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useWindowStore } from '../../store/useWindowStore'
+import { getAppById } from '../../core/app-registry'
 import WindowHeader from './WindowHeader'
 import type { WindowInstance } from '../../types'
 
 interface WindowFrameProps {
   win: WindowInstance
-  children?: React.ReactNode
 }
 
-export default function WindowFrame({ win, children }: WindowFrameProps) {
+export default function WindowFrame({ win }: WindowFrameProps) {
   const { closeWindow, focusWindow, minimizeWindow, maximizeWindow, updatePosition } =
     useWindowStore()
 
@@ -55,6 +55,9 @@ export default function WindowFrame({ win, children }: WindowFrameProps) {
         height: win.size.height,
       }
 
+  const app = getAppById(win.appId)
+  const AppComponent = app?.component
+
   return (
     <AnimatePresence>
       {!win.isMinimized && (
@@ -63,7 +66,7 @@ export default function WindowFrame({ win, children }: WindowFrameProps) {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          transition={{ duration: win.isMinimized ? 0.2 : 0.25, ease: 'easeOut' }}
+          transition={{ duration: 0.25, ease: 'easeOut' }}
           style={{ ...style, zIndex: win.zIndex }}
           className={`absolute flex flex-col rounded-2xl overflow-hidden
             border transition-shadow duration-200
@@ -73,7 +76,6 @@ export default function WindowFrame({ win, children }: WindowFrameProps) {
             }`}
           onMouseDown={() => focusWindow(win.id)}
         >
-          {/* Glassmorphism surface */}
           <div className="absolute inset-0 bg-[rgba(15,23,42,0.80)] backdrop-blur-xl -z-10" />
 
           <WindowHeader
@@ -86,11 +88,18 @@ export default function WindowFrame({ win, children }: WindowFrameProps) {
             onMaximize={() => maximizeWindow(win.id)}
           />
 
-          {/* Content area */}
-          <div className="flex-1 overflow-auto p-4 text-[#CBD5E1]">
-            {children ?? (
+          <div className="flex-1 overflow-auto text-[#CBD5E1]">
+            {AppComponent ? (
+              <Suspense fallback={
+                <div className="flex items-center justify-center h-full text-[#94A3B8] text-sm">
+                  Loading…
+                </div>
+              }>
+                <AppComponent />
+              </Suspense>
+            ) : (
               <div className="flex items-center justify-center h-full text-[#94A3B8] text-sm">
-                {win.title} — content coming in Milestone 5
+                {win.title} — app not found in registry
               </div>
             )}
           </div>

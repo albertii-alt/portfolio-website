@@ -1,1 +1,3 @@
-// Terminal app — implemented in Milestone 6
+export default function TerminalApp() {
+  return null // Implemented in Milestone 6
+}

@@ -1,8 +1,11 @@
+import type { ComponentType } from 'react'
+
 export interface AppRegistryEntry {
   id: string
   name: string
   icon: string
   defaultSize: { width: number; height: number }
+  component: ComponentType
 }
 
 export interface WindowInstance {

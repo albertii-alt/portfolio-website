@@ -1,1 +1,3 @@
-// Resume app — implemented in Milestone 5
+export default function ResumeApp() {
+  return null // Implemented in Milestone 5
+}

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { useWindowStore } from '../../store/useWindowStore'
 
 interface ContextMenuProps {
   x: number
@@ -6,14 +7,9 @@ interface ContextMenuProps {
   onClose: () => void
 }
 
-const items = [
-  { label: 'Refresh', icon: '↺' },
-  { label: 'Open AI Assistant', icon: '✦' },
-  { label: 'Open Terminal', icon: '>_' },
-]
-
 export default function ContextMenu({ x, y, onClose }: ContextMenuProps) {
   const ref = useRef<HTMLDivElement>(null)
+  const openWindow = useWindowStore((s) => s.openWindow)
 
   useEffect(() => {
     const handle = (e: MouseEvent) => {
@@ -22,6 +18,24 @@ export default function ContextMenu({ x, y, onClose }: ContextMenuProps) {
     document.addEventListener('mousedown', handle)
     return () => document.removeEventListener('mousedown', handle)
   }, [onClose])
+
+  const items = [
+    {
+      label: 'Refresh',
+      icon: '↺',
+      action: () => window.location.reload(),
+    },
+    {
+      label: 'Open AI Assistant',
+      icon: '✦',
+      action: () => openWindow('ai-assistant'),
+    },
+    {
+      label: 'Open Terminal',
+      icon: '>_',
+      action: () => openWindow('terminal'),
+    },
+  ]
 
   return (
     <div
@@ -34,7 +48,7 @@ export default function ContextMenu({ x, y, onClose }: ContextMenuProps) {
       {items.map((item) => (
         <button
           key={item.label}
-          onClick={onClose}
+          onClick={() => { item.action(); onClose() }}
           className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#CBD5E1]
             hover:bg-white/10 hover:text-white transition-colors duration-150 text-left"
         >

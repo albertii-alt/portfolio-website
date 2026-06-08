@@ -1,1 +1,3 @@
-// About app — implemented in Milestone 5
+export default function AboutApp() {
+  return null // Implemented in Milestone 5
+}

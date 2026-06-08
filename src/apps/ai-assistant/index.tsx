@@ -1,1 +1,3 @@
-// AI Assistant app — implemented in Milestone 7
+export default function AIAssistantApp() {
+  return null // Implemented in Milestone 7
+}

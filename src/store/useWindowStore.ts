@@ -1,16 +1,10 @@
 import { create } from 'zustand'
+import { getAppById } from '../core/app-registry'
 import type { WindowInstance } from '../types'
-
-interface OpenWindowPayload {
-  appId: string
-  title: string
-  icon: string
-  size?: { width: number; height: number }
-}
 
 interface WindowStore {
   windows: WindowInstance[]
-  openWindow: (payload: OpenWindowPayload) => void
+  openWindow: (appId: string) => void
   closeWindow: (windowId: string) => void
   focusWindow: (windowId: string) => void
   minimizeWindow: (windowId: string) => void
@@ -33,9 +27,13 @@ function centeredPosition(width: number, height: number) {
 export const useWindowStore = create<WindowStore>((set) => ({
   windows: [],
 
-  openWindow({ appId, title, icon, size = { width: 720, height: 480 } }) {
+  openWindow(appId) {
+    const app = getAppById(appId)
+    if (!app) return
+
+    const { name, icon, defaultSize: size } = app
+
     set((state) => {
-      // If already open, just focus it
       const existing = state.windows.find((w) => w.appId === appId)
       if (existing) {
         const z = nextZ()
@@ -51,8 +49,6 @@ export const useWindowStore = create<WindowStore>((set) => ({
       const id = `${appId}-${Date.now()}`
       const z = nextZ()
       const position = centeredPosition(size.width, size.height)
-
-      // Slight cascade offset per open window count
       const offset = state.windows.length * 24
       position.x += offset
       position.y += offset
@@ -60,7 +56,7 @@ export const useWindowStore = create<WindowStore>((set) => ({
       const newWindow: WindowInstance = {
         id,
         appId,
-        title,
+        title: name,
         icon,
         position,
         size,
@@ -82,14 +78,10 @@ export const useWindowStore = create<WindowStore>((set) => ({
   closeWindow(windowId) {
     set((state) => {
       const remaining = state.windows.filter((w) => w.id !== windowId)
-      // Re-focus topmost remaining window
       if (remaining.length > 0) {
         const top = [...remaining].sort((a, b) => b.zIndex - a.zIndex)[0]
         return {
-          windows: remaining.map((w) => ({
-            ...w,
-            isActive: w.id === top.id,
-          })),
+          windows: remaining.map((w) => ({ ...w, isActive: w.id === top.id })),
         }
       }
       return { windows: [] }
