@@ -1,24 +1,24 @@
 import { useState, useCallback } from 'react'
 import DesktopIcon from './DesktopIcon'
 import ContextMenu from './ContextMenu'
+import WindowManager from '../window'
+import { useWindowStore } from '../../store/useWindowStore'
 
 const ICONS = [
-  { label: 'About', icon: '👤' },
-  { label: 'Projects', icon: '🗂️' },
-  { label: 'Skills', icon: '⚡' },
-  { label: 'Resume', icon: '📄' },
-  { label: 'Contact', icon: '✉️' },
-  { label: 'Terminal', icon: '>_' },
-  { label: 'AI Assistant', icon: '✦' },
+  { label: 'About',        icon: '👤', appId: 'about',        size: { width: 680, height: 480 } },
+  { label: 'Projects',     icon: '🗂️', appId: 'projects',     size: { width: 800, height: 560 } },
+  { label: 'Skills',       icon: '⚡', appId: 'skills',       size: { width: 640, height: 480 } },
+  { label: 'Resume',       icon: '📄', appId: 'resume',       size: { width: 680, height: 520 } },
+  { label: 'Contact',      icon: '✉️', appId: 'contact',      size: { width: 560, height: 440 } },
+  { label: 'Terminal',     icon: '>_', appId: 'terminal',     size: { width: 640, height: 400 } },
+  { label: 'AI Assistant', icon: '✦',  appId: 'ai-assistant', size: { width: 520, height: 560 } },
 ]
 
-interface MenuState {
-  x: number
-  y: number
-}
+interface MenuState { x: number; y: number }
 
 export default function Desktop() {
   const [menu, setMenu] = useState<MenuState | null>(null)
+  const openWindow = useWindowStore((s) => s.openWindow)
 
   const handleContextMenu = useCallback((e: React.MouseEvent) => {
     e.preventDefault()
@@ -26,6 +26,13 @@ export default function Desktop() {
   }, [])
 
   const closeMenu = useCallback(() => setMenu(null), [])
+
+  const handleIconOpen = useCallback(
+    (appId: string, label: string, icon: string, size: { width: number; height: number }) => {
+      openWindow({ appId, title: label, icon, size })
+    },
+    [openWindow]
+  )
 
   return (
     <div
@@ -40,11 +47,19 @@ export default function Desktop() {
       </div>
 
       {/* Desktop Icon Grid */}
-      <div className="absolute top-6 left-6 flex flex-col flex-wrap gap-2 max-h-[calc(100vh-96px)]">
+      <div className="absolute top-6 left-6 flex flex-col flex-wrap gap-2 max-h-[calc(100vh-96px)] z-10">
         {ICONS.map((item) => (
-          <DesktopIcon key={item.label} label={item.label} icon={item.icon} />
+          <DesktopIcon
+            key={item.label}
+            label={item.label}
+            icon={item.icon}
+            onOpen={() => handleIconOpen(item.appId, item.label, item.icon, item.size)}
+          />
         ))}
       </div>
+
+      {/* Window Manager */}
+      <WindowManager />
 
       {/* Context Menu */}
       {menu && <ContextMenu x={menu.x} y={menu.y} onClose={closeMenu} />}

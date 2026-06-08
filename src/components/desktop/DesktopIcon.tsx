@@ -1,11 +1,13 @@
 interface DesktopIconProps {
   label: string
   icon: string
+  onOpen: () => void
 }
 
-export default function DesktopIcon({ label, icon }: DesktopIconProps) {
+export default function DesktopIcon({ label, icon, onOpen }: DesktopIconProps) {
   return (
     <button
+      onDoubleClick={onOpen}
       className="flex flex-col items-center gap-1.5 p-2 rounded-xl w-20 group
         hover:bg-white/10 transition-all duration-150 focus:outline-none
         focus-visible:ring-2 focus-visible:ring-[#38BDF8]"
