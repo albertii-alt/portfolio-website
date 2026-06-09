@@ -7,3 +7,9 @@ html, body {
   margin: 0;
   background: #0F172A;
 }
+
+/* Terminal input placeholder — subdued, not invisible */
+.terminal-input::placeholder {
+  color: #334155;
+  opacity: 1;
+}
