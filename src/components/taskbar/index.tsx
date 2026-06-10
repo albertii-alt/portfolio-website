@@ -3,7 +3,6 @@ import { useWindowStore } from '../../store/useWindowStore'
 
 function Clock() {
   const [time, setTime] = useState(() => new Date())
-
   useEffect(() => {
     const id = setInterval(() => setTime(new Date()), 1000)
     return () => clearInterval(id)
@@ -11,13 +10,14 @@ function Clock() {
 
   const hh = time.getHours().toString().padStart(2, '0')
   const mm = time.getMinutes().toString().padStart(2, '0')
+  const date = time.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 
   return (
-    <div className="flex flex-col items-end leading-none">
-      <span className="text-sm font-medium text-white">{hh}:{mm}</span>
-      <span className="text-[10px] text-[#94A3B8] mt-0.5">
-        {time.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+    <div className="flex flex-col items-end select-none" style={{ gap: 1 }}>
+      <span style={{ fontSize: 13, fontWeight: 600, color: '#F1F5F9', letterSpacing: '0.02em', lineHeight: 1 }}>
+        {hh}:{mm}
       </span>
+      <span style={{ fontSize: 10, color: '#64748B', lineHeight: 1 }}>{date}</span>
     </div>
   )
 }
@@ -27,68 +27,98 @@ export default function Taskbar() {
   const focusWindow = useWindowStore((s) => s.focusWindow)
   const minimizeWindow = useWindowStore((s) => s.minimizeWindow)
 
-  const handleTaskbarClick = (id: string, isActive: boolean, isMinimized: boolean) => {
-    if (isMinimized || !isActive) {
-      focusWindow(id)
-    } else {
-      minimizeWindow(id)
-    }
+  const handleClick = (id: string, isActive: boolean, isMinimized: boolean) => {
+    if (isMinimized || !isActive) focusWindow(id)
+    else minimizeWindow(id)
   }
 
   return (
-    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40
-      h-16 px-4 flex items-center gap-4
-      rounded-2xl
-      bg-[rgba(15,23,42,0.75)] backdrop-blur-xl
-      border border-white/10 shadow-2xl
-      min-w-[480px] max-w-[80vw]"
+    <div
+      className="absolute bottom-4 left-1/2 -translate-x-1/2 z-40
+        flex items-center h-14 px-3 gap-2"
+      style={{
+        background: 'rgba(11,17,32,0.80)',
+        backdropFilter: 'blur(28px)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        borderRadius: 18,
+        boxShadow: '0 8px 32px rgba(0,0,0,0.5), 0 0 0 0.5px rgba(255,255,255,0.04)',
+        minWidth: 420,
+        maxWidth: '82vw',
+      }}
     >
-      {/* Start Button */}
+      {/* Start button */}
       <button
         aria-label="Start menu"
-        className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0
-          bg-[#38BDF8]/20 hover:bg-[#38BDF8]/30 border border-[#38BDF8]/30
-          transition-colors duration-150"
+        className="shrink-0 w-8 h-8 rounded-xl flex items-center justify-center
+          transition-all duration-150"
+        style={{
+          background: 'rgba(56,189,248,0.14)',
+          border: '1px solid rgba(56,189,248,0.22)',
+          color: '#38BDF8',
+          fontSize: 15,
+        }}
+        onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(56,189,248,0.24)')}
+        onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(56,189,248,0.14)')}
       >
-        <span className="text-[#38BDF8] text-base font-bold leading-none">⊞</span>
+        ⊞
       </button>
 
-      <div className="w-px h-6 bg-white/10 shrink-0" />
+      {/* Divider */}
+      <div className="w-px h-5 shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
 
-      {/* Running Apps */}
-      <div className="flex-1 flex items-center gap-1.5 overflow-x-auto">
+      {/* Running apps */}
+      <div className="flex-1 flex items-center gap-1.5 overflow-x-auto min-w-0"
+        style={{ scrollbarWidth: 'none' }}>
         {windows.length === 0 ? (
-          <span className="text-[#94A3B8] text-xs mx-auto">No open applications</span>
+          <span className="mx-auto text-xs" style={{ color: '#334155' }}>
+            No open applications
+          </span>
         ) : (
-          windows.map((win) => (
-            <button
-              key={win.id}
-              onClick={() => handleTaskbarClick(win.id, win.isActive, win.isMinimized)}
-              aria-label={win.title}
-              className={`flex items-center gap-2 px-3 h-9 rounded-xl text-xs font-medium
-                border transition-all duration-150 shrink-0 max-w-[140px]
-                ${win.isActive && !win.isMinimized
-                  ? 'bg-[#38BDF8]/20 border-[#38BDF8]/40 text-white'
-                  : 'bg-white/5 border-white/10 text-[#94A3B8] hover:bg-white/10 hover:text-white'
-                }`}
-            >
-              <span className="text-sm leading-none shrink-0">{win.icon}</span>
-              <span className="truncate">{win.title}</span>
-              {win.isMinimized && (
-                <span className="w-1 h-1 rounded-full bg-[#94A3B8] shrink-0" />
-              )}
-            </button>
-          ))
+          windows.map((win) => {
+            const active = win.isActive && !win.isMinimized
+            return (
+              <button
+                key={win.id}
+                onClick={() => handleClick(win.id, win.isActive, win.isMinimized)}
+                aria-label={win.title}
+                className="relative flex items-center gap-1.5 px-2.5 h-8 rounded-xl
+                  shrink-0 transition-all duration-150"
+                style={{
+                  maxWidth: 132,
+                  fontSize: 12,
+                  fontWeight: 500,
+                  background: active ? 'rgba(56,189,248,0.16)' : 'rgba(255,255,255,0.05)',
+                  border: `1px solid ${active ? 'rgba(56,189,248,0.30)' : 'rgba(255,255,255,0.07)'}`,
+                  color: active ? '#F1F5F9' : '#64748B',
+                }}
+              >
+                <span className="text-sm leading-none shrink-0">{win.icon}</span>
+                <span className="truncate">{win.title}</span>
+                {/* Active indicator dot */}
+                {active && (
+                  <span
+                    className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                    style={{ background: '#38BDF8' }}
+                  />
+                )}
+                {win.isMinimized && (
+                  <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full"
+                    style={{ background: '#475569' }} />
+                )}
+              </button>
+            )
+          })
         )}
       </div>
 
-      <div className="w-px h-6 bg-white/10 shrink-0" />
+      {/* Divider */}
+      <div className="w-px h-5 shrink-0" style={{ background: 'rgba(255,255,255,0.08)' }} />
 
-      {/* System Tray + Clock */}
-      <div className="flex items-center gap-3 shrink-0">
-        <div className="flex items-center gap-1.5">
-          <span className="text-[#94A3B8] text-xs">🔊</span>
-          <span className="text-[#94A3B8] text-xs">📶</span>
+      {/* Tray + Clock */}
+      <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-1" style={{ color: '#334155', fontSize: 13 }}>
+          <span>🔊</span>
+          <span>📶</span>
         </div>
         <Clock />
       </div>

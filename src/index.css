@@ -1,15 +1,40 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-html, body {
-  height: 100%;
-  margin: 0;
-  background: #0F172A;
+:root {
+  --bg:        #0B1120;
+  --surface:   rgba(13, 20, 38, 0.82);
+  --border:    rgba(255, 255, 255, 0.07);
+  --accent:    #38BDF8;
+  --accent-dim: rgba(56, 189, 248, 0.15);
+  --text-1:    #F1F5F9;
+  --text-2:    #94A3B8;
+  --text-3:    #475569;
 }
 
-/* Terminal input placeholder — subdued, not invisible */
-.terminal-input::placeholder {
-  color: #334155;
-  opacity: 1;
+*, *::before, *::after {
+  box-sizing: border-box;
 }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar        { width: 4px; height: 4px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: rgba(255,255,255,0.12); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+
+/* Terminal */
+.terminal-input::placeholder { color: #2D3F55; opacity: 1; }

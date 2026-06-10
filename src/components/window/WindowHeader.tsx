@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 interface WindowHeaderProps {
   title: string
   icon: string
@@ -9,62 +11,62 @@ interface WindowHeaderProps {
 }
 
 export default function WindowHeader({
-  title,
-  icon,
-  isMaximized,
-  onClose,
-  onMinimize,
-  onMaximize,
-  onMouseDown,
+  title, icon, isMaximized,
+  onClose, onMinimize, onMaximize, onMouseDown,
 }: WindowHeaderProps) {
+  const [hovered, setHovered] = useState(false)
+
   return (
     <div
-      className="flex items-center justify-between px-4 h-12 shrink-0
-        border-b border-white/10 cursor-grab active:cursor-grabbing select-none"
       onMouseDown={onMouseDown}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      className="flex items-center gap-3 px-4 shrink-0 cursor-grab active:cursor-grabbing select-none"
+      style={{
+        height: 44,
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        background: 'rgba(255,255,255,0.02)',
+      }}
     >
-      {/* Left: icon + title */}
-      <div className="flex items-center gap-2.5">
-        <span className="text-base leading-none">{icon}</span>
-        <span className="text-sm font-medium text-[#CBD5E1]">{title}</span>
-      </div>
-
-      {/* Right: window controls */}
+      {/* Traffic lights */}
       <div
-        className="flex items-center gap-1.5"
+        className="flex items-center gap-1.5 shrink-0"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {/* Minimize */}
-        <button
-          onClick={onMinimize}
-          aria-label="Minimize"
-          className="w-3.5 h-3.5 rounded-full bg-[#F59E0B] hover:brightness-125
-            transition-all duration-150 flex items-center justify-center group"
-        >
-          <span className="hidden group-hover:block text-[8px] text-black font-bold leading-none">−</span>
-        </button>
+        {[
+          { color: '#EF4444', hoverColor: '#FF6B6B', symbol: '×', action: onClose,    label: 'Close' },
+          { color: '#F59E0B', hoverColor: '#FBBF24', symbol: '−', action: onMinimize, label: 'Minimize' },
+          { color: '#22C55E', hoverColor: '#4ADE80', symbol: isMaximized ? '⊡' : '+', action: onMaximize, label: isMaximized ? 'Restore' : 'Maximize' },
+        ].map((btn) => (
+          <button
+            key={btn.label}
+            onClick={btn.action}
+            aria-label={btn.label}
+            className="w-3.5 h-3.5 rounded-full flex items-center justify-center
+              transition-all duration-150"
+            style={{
+              background: hovered ? btn.color : 'rgba(255,255,255,0.15)',
+              boxShadow: hovered ? `0 0 6px ${btn.color}66` : 'none',
+              fontSize: 8,
+              fontWeight: 700,
+              color: 'rgba(0,0,0,0.7)',
+              lineHeight: 1,
+            }}
+          >
+            {hovered ? btn.symbol : null}
+          </button>
+        ))}
+      </div>
 
-        {/* Maximize */}
-        <button
-          onClick={onMaximize}
-          aria-label={isMaximized ? 'Restore' : 'Maximize'}
-          className="w-3.5 h-3.5 rounded-full bg-[#22C55E] hover:brightness-125
-            transition-all duration-150 flex items-center justify-center group"
+      {/* Icon + Title */}
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        <span style={{ fontSize: 14, lineHeight: 1 }}>{icon}</span>
+        <span
+          className="truncate"
+          style={{ fontSize: 13, fontWeight: 500, color: 'rgba(203,213,225,0.9)', letterSpacing: '0.01em' }}
         >
-          <span className="hidden group-hover:block text-[8px] text-black font-bold leading-none">
-            {isMaximized ? '⊡' : '⊞'}
-          </span>
-        </button>
-
-        {/* Close */}
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="w-3.5 h-3.5 rounded-full bg-[#EF4444] hover:brightness-125
-            transition-all duration-150 flex items-center justify-center group"
-        >
-          <span className="hidden group-hover:block text-[8px] text-black font-bold leading-none">×</span>
-        </button>
+          {title}
+        </span>
       </div>
     </div>
   )

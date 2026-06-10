@@ -23,15 +23,27 @@ export default function Desktop() {
       className="relative w-full h-full overflow-hidden select-none"
       onContextMenu={handleContextMenu}
     >
-      {/* Wallpaper */}
-      <div className="absolute inset-0 bg-[#0F172A]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0F172A] via-[#0F1F3D] to-[#0F172A]" />
-        <div className="absolute top-1/4 left-1/3 w-96 h-96 rounded-full bg-[#38BDF8]/5 blur-3xl pointer-events-none" />
-        <div className="absolute bottom-1/3 right-1/4 w-80 h-80 rounded-full bg-[#38BDF8]/3 blur-3xl pointer-events-none" />
+      {/* Wallpaper layers */}
+      <div className="absolute inset-0" style={{ background: 'var(--bg)' }}>
+        {/* Subtle grid */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: 'linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)',
+            backgroundSize: '48px 48px',
+          }}
+        />
+        {/* Ambient glows */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full opacity-[0.07]"
+          style={{ background: 'radial-gradient(ellipse, #38BDF8 0%, transparent 70%)' }} />
+        <div className="absolute bottom-0 right-0 w-[600px] h-[400px] rounded-full opacity-[0.04]"
+          style={{ background: 'radial-gradient(ellipse, #818CF8 0%, transparent 70%)' }} />
+        <div className="absolute top-1/2 left-0 w-[400px] h-[400px] rounded-full opacity-[0.03]"
+          style={{ background: 'radial-gradient(ellipse, #38BDF8 0%, transparent 70%)' }} />
       </div>
 
-      {/* Desktop Icon Grid — generated from registry */}
-      <div className="absolute top-6 left-6 flex flex-col flex-wrap gap-2 max-h-[calc(100vh-96px)] z-10">
+      {/* Desktop Icon Grid */}
+      <div className="absolute top-8 left-6 flex flex-col gap-1 z-10">
         {APP_REGISTRY.map((app) => (
           <DesktopIcon
             key={app.id}
@@ -42,10 +54,8 @@ export default function Desktop() {
         ))}
       </div>
 
-      {/* Window Manager */}
       <WindowManager />
 
-      {/* Context Menu */}
       {menu && <ContextMenu x={menu.x} y={menu.y} onClose={closeMenu} />}
     </div>
   )
